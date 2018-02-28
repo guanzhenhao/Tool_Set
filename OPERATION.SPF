@@ -1,0 +1,29 @@
+PROC OPERATION DISPLON
+;;**********程序功能**********
+;;对刀主程序:
+;;首次对刀 二次对刀 自动对刀 角度计算 等子程序的调用
+;;***************************
+DEF STRING[20] OPE_STRING
+IF (INI[53]<>0) AND (GRIND[2]==1);砂轮对刀转速不为零和手动对刀下
+    F_GRINDWHEEL_RUN(INI[53])
+ENDIF
+
+IF TOOL_SET[8]==0;首次对刀
+    IF GRIND[2]==1;手动对刀
+        OPE_STRING="OPERATION_JOG";手动对刀程序
+    ELSE
+        OPE_STRING="OPERATION_AUTO";自动对刀程序
+    ENDIF
+ELSE;二次对刀
+    OPE_STRING="OPERATION_RAND";二次对刀子程序
+ENDIF
+
+EXECSTRING(OPE_STRING);调用由OPE_STRING指定的对刀程序
+
+PLCASUP1;跳转到初始角度计算子程序
+G500
+T0D0
+G0 Z=Z=INI[6]+30
+G0 X=INI[23]
+RET
+

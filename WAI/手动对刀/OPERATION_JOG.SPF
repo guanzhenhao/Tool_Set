@@ -1,0 +1,44 @@
+PROC OPERATION_JOG DISPLOF
+;;**********程序功能**********
+;;螺纹手动对刀,外螺纹对刀，走插补语句要修改
+;;***************************
+DEF REAL PER;;对刀行程占总磨削长度的比例
+G500
+T0D0
+CASE TOOL_SET[19] OF 0 GOTOF DDD0 1 GOTOF DDD1 2 GOTOF DDD2 DEFAULT GOTOF DDD0
+
+DDD0:
+MSG("正在开至工件起点")
+G90 G0 Z=INI[6]+30
+G01 G90 X=INI[10] F=INI[55];X开至对刀起始位
+G90 G0 Z=INI[6]
+GOTOF DDD2
+
+DDD1:
+MSG("正在开至工件中点")
+G90 G0 Z=INI[8]
+GOTOF DDD2
+
+DDD2:
+MSG("X轴开至对刀起始位")
+G01 G90 X=INI[10] F=INI[55];X开至对刀起始位
+G90 G01 C=ACP(INI[27]) F=INI[58];C轴转到装夹工件角度
+STOPRE
+G55
+T1D1
+TOOL_SET[5]=$AA_IM[C];读取C轴初始角度 
+TOOL_SET[0]=$AA_IM[Z];读取对刀开始时Z轴坐标
+TOOL_SET[59]=$AA_IW[X];读取wcs中的X坐标
+PER=(INI[7]-TOOL_SET[0])/INI[3]
+MSG("手动对刀已启动,请进行对刀操作")
+IF INI[109]==0;;对刀模式(zc插补0/静止对刀1)
+	ID=2 EVERY $A_DBB[2]==1 DO POS[X]=30
+	G91 Z=-INI[0]*INI[3]*PER C=INI[9]*PER F=30*INI[5];外螺纹,右旋INI[0]=1,左旋=-1
+	CANCEL(2)
+ELSE
+    M0
+    STOPRE
+ENDIF
+
+RET
+

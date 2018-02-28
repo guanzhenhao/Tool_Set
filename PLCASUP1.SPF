@@ -1,0 +1,69 @@
+PROC PLCASUP1 DISPLOF
+;;**********程序功能**********
+;;退刀及角度计算程序:
+;;首次对刀 手动对刀 自动对刀 二次对刀 下的C角度及X初始位计算，退刀键的回退动作
+;;***************************
+
+DEF REAL DR1,DR2,DR3 DR11,DR12,DR13
+
+IF INI[25]==0;不在磨削程序中退刀就不进行C角度计算
+	GOTOF X_BACK
+ENDIF
+
+STOPRE
+
+TOOL_SET[2]=$AC_DRF[Z];对刀完成时手轮偏置值
+TOOL_SET[20]=$AC_DRF[X];对刀完成时手轮偏置值
+
+IF TOOL_SET[8]==0;首次对刀
+	IF GRIND[2]==1;手动对刀
+		DR1=ABS(TOOL_SET[0]+TOOL_SET[2]-INI[6]);当前位置到起始点的距离
+		DR2=DR1/INI[5]
+		DR3=(DR2-TRUNC(DR2))*360
+		IF GRIND[0]<>1;不是内螺纹
+			TOOL_SET[4]=TOOL_SET[5]-DR3
+		ELSE
+			IF INI[0]==-1;左旋
+				TOOL_SET[4]=TOOL_SET[5]+DR3
+			ELSE
+				TOOL_SET[4]=TOOL_SET[5]-DR3
+			ENDIF
+		ENDIF
+		PROCESS[13]=TOOL_SET[59]+TOOL_SET[20];砂轮初始磨削进刀位赋值;$AA_IW[X]
+		PROCESS[4]=PROCESS[13];当前等于初始
+	ENDIF
+	TOOL_SET[8]=1;改为二次对刀
+	PROCESS[14]=0;工艺累积进刀清零
+ELSE;非首次对刀
+	IF TOOL_SET[40]<>0;二次对刀标记
+		PROCESS[13]=PROCESS[13]+TOOL_SET[20]+2
+		PROCESS[4]=PROCESS[4]+TOOL_SET[20]+2;二次对刀X计算
+		TOOL_SET[40]=0;标记复位,对刀后直接进入磨削时跳转到下面的情况
+	ELSE;磨削中调整
+		PROCESS[13]=PROCESS[13]+TOOL_SET[20];磨削过程中调整X
+		PROCESS[4]=PROCESS[4]+TOOL_SET[20];磨削过程中调整X
+	ENDIF
+	IF INI[0]==-1;左旋
+		TOOL_SET[4]=TOOL_SET[4]-TOOL_SET[2]/INI[5]*360
+	ELSE
+		TOOL_SET[4]=TOOL_SET[4]+TOOL_SET[2]/INI[5]*360;Z轴偏刀调整
+	ENDIF
+ENDIF
+
+F_ANG_WITHIN_360(TOOL_SET[4])
+TOOL_SET[2]=0;计算完直接清0
+TOOL_SET[20]=0
+
+STOPRE
+DRFOF
+
+X_BACK:
+IF $A_DBB[2]==1;按下退刀键
+	G500
+	T0D0
+	MSG("退刀中,请勿复位程序!")
+	G01 G90 X=INI[23] F=INI[54];退刀时的X值
+ENDIF
+
+RET
+
