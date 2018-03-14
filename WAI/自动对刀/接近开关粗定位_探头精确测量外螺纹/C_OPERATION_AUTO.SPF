@@ -4,8 +4,6 @@ PROC C_OPERATION_AUTO DISPLOF
 ;;适用于接近开关C轴旋转测量初次定位后探头精确测量;接近开关为测量机构1,探头为测量机构2
 ;;***************************
 DEF REAL DR30,DR31,DR32
-G500
-T0D0
 ;;接近开关初测
 MSG("正在运行到测量位置")
 G01 G90 C0 F10800;C轴快速移动到测量角度
@@ -19,30 +17,30 @@ G04 F0.2
 ENDWHILE
 STOPRE
 WHILE($A_PROBE[1]==1]);如果测头有信号
-G01 G91 C30 F7200
+G01 G91 C30 F3600
 STOPRE
 ENDWHILE
 ;C轴正向旋转测量
-MEAS=1 G91 G01 C360 F=3600;正向粗测
+MEAS=1 G91 G01 C360 F=1080;正向粗测
 STOPRE
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 TOOL_SET[37]=$AA_MM[C];记录接触角度
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 C-30 F=3600
+G91 G01 C-30 F=3600
 ENDWHILE
 ;C轴负向旋转测量
-MEAS=1 G91 G01 C-360 F=3600;负向粗测
+MEAS=1 G91 G01 C-360 F=1080;负向粗测
 STOPRE
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 TOOL_SET[38]=$AA_MM[C];记录接触角度
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 C30 F=3600
+G91 G01 C30 F=3600
 ENDWHILE
 M34;测头收回
 WHILE($A_DBB[7]<>1)
@@ -72,51 +70,51 @@ WHILE($A_DBB[21]<>1);对刀机构2是否伸出到位
 	G04 F0.2
 ENDWHILE
 STOPRE
-WHILE($A_PROBE[2]==1]);如果测头有信号
+WHILE($AC_MEA[2]==1]);如果测头有信号
 	MSG("测量错误,接近开关粗测角度有误!!!")
 	M0
 ENDWHILE
 ;C轴正向旋转测量
-MEAS=2 G91 G01 C=360 F=3600;正向第一次快速测量
+MEAS=2 G91 G01 C=360 F=360;正向第一次快速测量
 STOPRE
-WHILE($A_PROBE[2]==0);如果没有感应到信号
+WHILE($AC_MEA[2]==0);如果没有感应到信号
 	MSG("测量错误,测头未检测到信号")
 	M0
 ENDWHILE
 STOPRE
 WHILE($A_PROBE[2]==1);如果感应到信号，反向离开
-	G90 G01 C=-30 F=3600
+	G91 G01 C=-30 F=3600
 ENDWHILE
-MEAS=2 G91 G01 C360 F=360;正向第二次慢速测量
+MEAS=2 G91 G01 C360 F=180;正向第二次慢速测量
 STOPRE
-WHILE($A_PROBE[2]==0);如果没有感应到信号
+WHILE($AC_MEA[2]==0);如果没有感应到信号
 	MSG("测量错误,测头未检测到信号")
 	M0
 ENDWHILE
 TOOL_SET[37]=$AA_MM[C];记录第一次测量点角度
 WHILE($A_PROBE[2]==1);如果感应到信号，反向离开
-	G90 G01 C-30 F=3600
+	G91 G01 C-30 F=3600
 ENDWHILE
 ;C轴负向旋转测量
-MEAS=2 G91 G01 C=-360 F=3600;负向第一次快速测量
+MEAS=2 G91 G01 C=-360 F=360;负向第一次快速测量
 STOPRE
-WHILE($A_PROBE[2]==0);如果没有感应到信号
+WHILE($AC_MEA[2]==0);如果没有感应到信号
 	MSG("测量错误,测头未检测到信号")
 	M0
 ENDWHILE
 STOPRE
 WHILE($A_PROBE[2]==1);如果感应到信号，反向离开
-	G90 G01 C=30 F=3600
+	G91 G01 C=30 F=3600
 ENDWHILE
-MEAS=2 G91 G01 C-360 F=360;负向第二次慢速测量
+MEAS=2 G91 G01 C-360 F=180;负向第二次慢速测量
 STOPRE
-WHILE($A_PROBE[2]==0);如果没有感应到信号
+WHILE($AC_MEA[2]==0);如果没有感应到信号
 	MSG("测量错误,测头未检测到信号")
 	M0
 ENDWHILE
 TOOL_SET[38]=$AA_MM[C];记录第一次测量点角度
 WHILE($A_PROBE[2]==1);如果感应到信号，反向离开
-	G90 G01 C30 F=3600
+	G91 G01 C30 F=3600
 ENDWHILE
 
 IF TOOL_SET[37]<TOOL_SET[38]
