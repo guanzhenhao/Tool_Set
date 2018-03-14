@@ -15,7 +15,7 @@ MSG("反相器孔测量开始,请等待测量结束！")
 ;;宽度方向测量
 MEAS=1  G91	G01	Z=-DR15	C=-DR17 F=200   ;宽度方向右侧粗测
 STOPRE 
-IF  $A_PROBE[1]==0 GOTOF ERROR1         ;如果测头无信号
+IF  $AC_MEA[1]==0 GOTOF ERROR1         ;如果测头无信号
 WHILE($A_PROBE[1]==1)                   ;如果测头有信号
     G91	G01	Z=0.1*DR15	C=0.1*DR17	F=200
 ENDWHILE
@@ -29,8 +29,7 @@ WHILE($A_PROBE[1]==1)                   ;如果测头有信号
 ENDWHILE
 MEAS=1  G91	G01	Z=DR15 C=DR17 F=200     ;宽度方向左侧粗测
 STOPRE 
-STOPRE
-IF $A_PROBE[1]==0 GOTOF ERROR1          ;如果测头无信号
+IF $AC_MEA[1]==0 GOTOF ERROR1          ;如果测头无信号
 WHILE($A_PROBE[1]==1)                   ;如果测头有信号
     G91	G01	Z=-0.1*DR15	C=-0.1*DR17 F=200
 ENDWHILE
@@ -58,7 +57,7 @@ G90	G01	Z=DR22 C=DC(DR23) F=200
 ;(腰型孔长度方向测量)
 MEAS=1 G91	G01	Z=-DR12 C=DR14 F=200    ;长度方向下侧粗测
 STOPRE
-IF  $A_PROBE[1]==0 GOTOF ERROR1         ;如果测头无信号
+IF  $AC_MEA[1]==0 GOTOF ERROR1         ;如果测头无信号
 WHILE($A_PROBE[1]==1)
     G91	G01	Z=0.1*DR12	C=-0.1*DR14	F=50
 ENDWHILE
@@ -71,7 +70,7 @@ WHILE($A_PROBE[1]==1)
 ENDWHILE
 MEAS=1  G91	G01	Z=DR12	C=-DR14	F=200   ;长度放下上侧粗测
 STOPRE
-IF $A_PROBE[1]==0 GOTOF ERROR1
+IF $AC_MEA[1]==0 GOTOF ERROR1
 WHILE($A_PROBE[1]==1)
     G91	G01	Z=-0.1*DR12 C=0.1*DR14 F=200
 ENDWHILE	

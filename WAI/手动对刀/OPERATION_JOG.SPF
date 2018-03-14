@@ -3,8 +3,7 @@ PROC OPERATION_JOG DISPLOF
 ;;螺纹手动对刀,外螺纹对刀，走插补语句要修改
 ;;***************************
 DEF REAL PER;;对刀行程占总磨削长度的比例
-G500
-T0D0
+
 CASE TOOL_SET[19] OF 0 GOTOF DDD0 1 GOTOF DDD1 2 GOTOF DDD2 DEFAULT GOTOF DDD0
 
 DDD0:

@@ -4,8 +4,6 @@ PROC C_OPERATION_AUTO DISPLOF
 ;;适用于接近开关Z轴移动测量内滚道
 ;;***************************
 DEF REAL DR30,DR31
-G500
-T0D0
 MSG("正在运行到测量位置")
 G01 G90 Z=INI[48] F5000;Z轴快速移动到测量起始安全位置
 G01 G90 C=INI[49] F10800;C轴快速移动到测量角度
@@ -19,54 +17,54 @@ G04 F0.2
 ENDWHILE
 MSG("测头接近工件中")
 G01 G90 Z=TOOL_SET[61] F3000;接近开关进入工件开始测量的Z坐标
-G01 G90 X=TOOL_SET[60] F500;接近开关贴近工件待测量面X坐标
+MEAS=1 G01 G90 X=TOOL_SET[60] F500;接近开关贴近工件待测量面X坐标
 STOPRE
-WHILE($A_PROBE[1]==1]);如果测头有信号
+WHILE($AC_MEA[1]==1]);如果测头有信号
 MSG("测量错误")
 M0
 ENDWHILE
 ;右侧测量
 MEAS=1 G91 G01 Z=-2*INI[4] F=250;第一次快速测量右侧齿顶
 STOPRE
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 STOPRE
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 Z=0.5*INI[4] F=250
+G91 G01 Z=0.5*INI[4] F=250
 ENDWHILE
 MEAS=1 G91 G01 Z=-2*INI[4] F=50;第二次慢速测量右侧齿顶
 STOPRE
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 TOOL_SET[37]=$AA_MM[Z];记录右侧感应点坐标
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 Z=0.5*INI[4] F=250
+G91 G01 Z=0.5*INI[4] F=250
 ENDWHILE
 ;左侧测量
 MEAS=1 G91 G01 Z=2*INI[4] F=250;第一次快速测量左侧齿顶
 STOPRE 
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 STOPRE
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 Z=-0.5*INI[4] F=250
+G91 G01 Z=-0.5*INI[4] F=250
 ENDWHILE
 MEAS=1 G91 G01 Z=2*INI[4] F=50;第二次慢速测量左侧齿顶
 STOPRE
-WHILE($A_PROBE[1]==0);如果没有感应到信号
+WHILE($AC_MEA[1]==0);如果没有感应到信号
 MSG("测量错误,测头未检测到信号")
 M0
 ENDWHILE
 TOOL_SET[38]=$AA_MM[Z];记录右侧感应点坐标
 STOPRE
 WHILE($A_PROBE[1]==1);如果感应到信号，反向离开
-G90 G01 Z=-0.5*INI[4] F=250
+G91 G01 Z=-0.5*INI[4] F=250
 ENDWHILE
 
 TOOL_SET[5]=INI[49]
